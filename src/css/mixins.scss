@@ -1,0 +1,65 @@
+@mixin position-relative($width, $height, $top: false, $right: false, $bottom: false, $left: false) {
+  position: relative;
+  @if $top {
+    top: $top;
+  }
+  @if $right {
+    right: $right;
+  }
+  @if $bottom {
+    bottom: $bottom;
+  }
+  @if $left {
+    left: $left;
+  }
+  @if $width {
+    width: $width;
+  }
+  @if $height {
+    height: $height;
+  }
+}
+
+@mixin position-absolute($width, $height, $top: false, $right: false, $bottom: false, $left: false) {
+  position: absolute;
+  @if $top {
+    top: $top;
+  }
+  @if $right {
+    right: $right;
+  }
+  @if $bottom {
+    bottom: $bottom;
+  }
+  @if $left {
+    left: $left;
+  }
+  @if $width {
+    width: $width;
+  }
+  @if $height {
+    height: $height;
+  }
+}
+
+@mixin position-fixed($width, $height, $top: false, $right: false, $bottom: false, $left: false) {
+  position: fixed;
+  @if $top {
+    top: $top;
+  }
+  @if $right {
+    right: $right;
+  }
+  @if $bottom {
+    bottom: $bottom;
+  }
+  @if $left {
+    left: $left;
+  }
+  @if $width {
+    width: $width;
+  }
+  @if $height {
+    height: $height;
+  }
+}

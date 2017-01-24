@@ -81,18 +81,14 @@
        'process.env': {NODE_ENV: JSON.stringify(process.env.NODE_ENV)}
      }),
 
-     new webpack.NamedModulesPlugin(),
+     new webpack.ProvidePlugin({
+       fetch: 'exports?self.fetch!whatwg-fetch'
+     }),
 
-     new CopyWebPackPlugin([
-       {from: 'js/worker.js'}
-     ])
+    //  new CopyWebPackPlugin([
+    //    {from: 'js/worker.js'}
+    //  ])
    ]),
-
-   target: 'web',
-
-   stats: true,
-
-   performance: Object.assign({}, options.performance),
 
    devtool: options.devtool
  });

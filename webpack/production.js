@@ -19,30 +19,13 @@
      main: 'js/main',
 
      common: [
-      //  'immutable',
-       'whatwg-fetch',
-       'es6-promise' // is this needed now with the babel polyfill? need to check
+       'whatwg-fetch'
      ],
 
-    //  react: [
-    //    'react',
-    //    'react-dom',
-    //    'react-addons-css-transition-group',
-    //    'react-addons-transition-group'
-    //  ],
-
-    //  reactrouter: [
-    //    'react-router/es',
-    //    'history'
-    //  ],
-     
-     // this should be imported dynamically if being used.
-    //  redux: [
-    //    'redux',
-    //    'redux-thunk',
-    //    'react-redux',
-    //    'react-router-redux',
-    //  ]
+     react: [
+       'react',
+       'react-dom'
+     ],
    },
 
    output: {
@@ -61,43 +44,38 @@
        debug: false
      }),
 
+     new webpack.optimize.AggressiveMergingPlugin(),
+     
+     new webpack.optimize.CommonsChunkPlugin({
+       name: ['common', 'react', 'manifest']
+     }),
+
      // split css to its own file
      new ExtractTextPlugin({filename: 'main.css', disable: false, allChunks: true}),
 
-     new webpack.optimize.CommonsChunkPlugin({
-       name: ['common', 'manifest']
-     }),
-
      // minify js fils
-     new webpack.optimize.UglifyJsPlugin({
-      beautify: false,
-      mangle: {
-        screw_ie8: true,
-        keep_fnames: true
-      },
-      compress: {
-        screw_ie8: true
-      },
-      comments: false
-     }),
+    //  new webpack.optimize.UglifyJsPlugin({
+        // compress: {
+        //   warnings: false,
+        //   screw_ie8: true,
+        //   conditionals: true,
+        //   unused: true,
+        //   comparisons: true,
+        //   sequences: true,
+        //   dead_code: true,
+        //   evaluate: true,
+        //   if_return: true,
+        //   join_vars: true,
+        // },
+        // output: {
+        //   comments: false
+        // },
+    //  }),
 
      new HtmlWebpackPlugin({
        filename: '../index.html',
        template: 'layout/index.html',
-       chunksSortMode: 'dependency',
-      //  minify: {
-      //   removeComments: true,
-      //   collapseWhitespace: true,
-      //   removeRedundantAttributes: true,
-      //   useShortDoctype: true,
-      //   removeEmptyAttributes: true,
-      //   removeStyleLinkTypeAttributes: true,
-      //   keepClosingSlash: true,
-      //   minifyJS: true,
-      //   minifyCSS: true,
-      //   minifyURLs: true,
-      // },
-      // inject: true
+       chunksSortMode: 'dependency'
      })
    ]
  })
