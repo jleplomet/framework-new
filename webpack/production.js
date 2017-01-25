@@ -19,7 +19,9 @@
      main: 'js/main',
 
      common: [
-       'whatwg-fetch'
+       'whatwg-fetch',
+       'js/plugins/soundjs',
+       'js/plugins/preloadjs'
      ],
 
      react: [
@@ -33,7 +35,7 @@
 
      publicPath: 'files/',
 
-     filename: '[name].[chunkhash].js'
+     filename: 'chunk.[name].[chunkhash:8].js'
    },
 
    cssLoaders: ExtractTextPlugin.extract('css-loader!postcss-loader!sass-loader'),
@@ -54,28 +56,33 @@
      new ExtractTextPlugin({filename: 'main.css', disable: false, allChunks: true}),
 
      // minify js fils
-    //  new webpack.optimize.UglifyJsPlugin({
-        // compress: {
-        //   warnings: false,
-        //   screw_ie8: true,
-        //   conditionals: true,
-        //   unused: true,
-        //   comparisons: true,
-        //   sequences: true,
-        //   dead_code: true,
-        //   evaluate: true,
-        //   if_return: true,
-        //   join_vars: true,
-        // },
-        // output: {
-        //   comments: false
-        // },
-    //  }),
+     new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false,
+          screw_ie8: true,
+          conditionals: true,
+          unused: true,
+          comparisons: true,
+          sequences: true,
+          dead_code: true,
+          evaluate: true,
+          if_return: true,
+          join_vars: true,
+        },
+        output: {
+          comments: false
+        },
+     }),
 
      new HtmlWebpackPlugin({
        filename: '../index.html',
        template: 'layout/index.html',
        chunksSortMode: 'dependency'
      })
-   ]
+   ],
+
+   performance: {
+     hints: "error",
+     maxEntrypointSize: 400000
+   }
  })

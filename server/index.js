@@ -24,11 +24,11 @@ function runDevServer(port) {
 
     publicPath: webpackConfig.output.publicPath,
 
-    quiet: true,
+    stats: "minimal",
 
     watchOptions: {
       ignored: /node_modules/
-    }
+    } 
   });
 
   devServer.listen(port, (error, result) => {
@@ -36,7 +36,7 @@ function runDevServer(port) {
       return console.log(error);
     }
 
-    console.log(chalk.cyan('Starting the development server...'));
+    console.log(chalk.cyan('Starting the development server...\n'));
 
     ngrok.connect(port, (innerErr, tunnelStarted) => {
       if (innerErr) {

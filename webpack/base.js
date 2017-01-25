@@ -82,13 +82,15 @@
      }),
 
      new webpack.ProvidePlugin({
-       fetch: 'exports?self.fetch!whatwg-fetch'
+       fetch: 'exports-loader?self.fetch!whatwg-fetch'
      }),
 
     //  new CopyWebPackPlugin([
     //    {from: 'js/worker.js'}
     //  ])
    ]),
+
+   performance: options.performance,
 
    devtool: options.devtool
  });
