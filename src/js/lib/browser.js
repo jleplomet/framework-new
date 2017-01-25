@@ -1,7 +1,6 @@
 
-import "./common";
+import {searchUA} from "./common";
 
-var userAgent = navigator.userAgent.toLowerCase();
 var browser = {};
 
 detectBrowser();
@@ -156,21 +155,4 @@ function detectBrowser() {
       })()
     }
   }
-}
-
-function searchUA(val) {
-  if (typeof val === 'string') {
-    val = [val];
-  }
-
-  var i = 0;
-  var l = val.length;
-
-  for (; i < l; i++) {
-    if (userAgent.strpos(val[i])) {
-      return true;
-    }
-  }
-
-  return false;
 }

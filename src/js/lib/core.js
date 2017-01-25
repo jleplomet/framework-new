@@ -1,4 +1,7 @@
 
+import {loadLanguage} from './language';
+import {loadAssets} from './assets';
+
 const NAMESPACE = '[lib/core]';
 
 var _settings = {
@@ -6,10 +9,41 @@ var _settings = {
   assetsLoadProgress: false,
   assetsMaxConnections: 10,
   cdnurl: 'files/',
-  phpurl: 'files/php/'
+  phpurl: 'files/php/',
+  languageFile: false,
+  languageCode: 'en_us'
 };
 
 var _bootMethods = [];
+
+export function boot() {
+  console.log(NAMESPACE, 'boot');
+
+  return new Promise(resolve => {
+    const { 
+      assets,
+      assetsLoadProgress,
+      assetsMaxConnections,
+      languageCode,
+      languageFile
+    } = getSettings();
+
+    if (languageFile) {
+      setBootMethod(() => loadLanguage(languageCode));
+    }
+
+    setBootMethod(() => loadAssets(assets, assetsLoadProgress, assetsMaxConnections));
+
+    _bootMethods.reduce((sequence, bootMethod) => {
+      return sequence.then(() => bootMethod());
+    }, Promise.resolve())
+      .then(() => {
+        console.log(NAMESPACE, 'boot complete');
+
+        resolve();
+      });
+  });
+}
 
 /**
  * Get default core settings.
@@ -29,8 +63,9 @@ export function setSettings(settings) {
   _settings = Object.assign(_settings, settings);
 }
 
+/**
+ * Add additional boot methods. 
+ */
 export function setBootMethod(method) {
-  if (!_bootMethods.indexOf(method)) {
-    _bootMethods.push(method);
-  }
+  _bootMethods.push(method);
 }
