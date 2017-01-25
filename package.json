@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest --verbose",
     "clean": "rimraf dist",
-    "dev": "NODE_ENV=development webpack-dashboard -c cyan -- node server",
+    "dev": "NODE_ENV=development node server",
     "build:webpack": "NODE_ENV=production webpack --optimize-minimize --config webpack/production.js --color",
     "build": "npm run clean && npm run build:webpack"
   },
