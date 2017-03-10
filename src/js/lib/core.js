@@ -1,6 +1,7 @@
 
 import {loadLanguage} from './language';
 import {loadAssets} from './assets';
+import loadReactEnvironment from './react';
 
 const NAMESPACE = '[lib/core]';
 
@@ -11,7 +12,8 @@ var _settings = {
   cdnurl: 'files/',
   phpurl: 'files/php/',
   languageFile: false,
-  languageCode: 'en_us'
+  languageCode: 'en_us',
+  useReact: false
 };
 
 var _bootMethods = [];
@@ -25,7 +27,8 @@ export function boot() {
       assetsLoadProgress,
       assetsMaxConnections,
       languageCode,
-      languageFile
+      languageFile,
+      useReact
     } = getSettings();
 
     if (languageFile) {
@@ -33,6 +36,10 @@ export function boot() {
     }
 
     setBootMethod(() => loadAssets(assets, assetsLoadProgress, assetsMaxConnections));
+
+    if (useReact) {
+      setBootMethod(() => loadReactEnvironment());
+    }
 
     _bootMethods.reduce((sequence, bootMethod) => {
       return sequence.then(() => bootMethod());

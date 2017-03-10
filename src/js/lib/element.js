@@ -25,4 +25,9 @@ function set(selector) {
 
 function get(selector) {
   return _cache[selector];
+
+}
+
+function $(node, selector) {
+  return [].slice.call(node.querySelectorAll(selector));
 }

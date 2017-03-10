@@ -8,6 +8,7 @@
 //  const cdnurl = require('../src/js/cdnurl');
 
  // webpack plugins
+ const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
  const HtmlWebpackPlugin = require('html-webpack-plugin');
  const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -22,11 +23,6 @@
        'whatwg-fetch',
        'js/plugins/soundjs',
        'js/plugins/preloadjs'
-     ],
-
-     react: [
-       'react',
-       'react-dom'
      ],
    },
 
@@ -46,10 +42,10 @@
        debug: false
      }),
 
-     new webpack.optimize.AggressiveMergingPlugin(),
+    //  new BundleAnalyzerPlugin(),
      
      new webpack.optimize.CommonsChunkPlugin({
-       name: ['common', 'react', 'manifest']
+       name: ['common', 'manifest']
      }),
 
      // split css to its own file
@@ -77,12 +73,11 @@
      new HtmlWebpackPlugin({
        filename: '../index.html',
        template: 'layout/index.html',
-       chunksSortMode: 'dependency'
      })
    ],
 
    performance: {
-     hints: "error",
+     hints: "warning",
      maxEntrypointSize: 400000
    }
  })

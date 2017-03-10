@@ -81,10 +81,6 @@
        'process.env': {NODE_ENV: JSON.stringify(process.env.NODE_ENV)}
      }),
 
-     new webpack.ProvidePlugin({
-       fetch: 'exports-loader?self.fetch!whatwg-fetch'
-     }),
-
     //  new CopyWebPackPlugin([
     //    {from: 'js/worker.js'}
     //  ])
