@@ -1,4 +1,3 @@
-
-import "whatwg-fetch";
-import "js/plugins/soundjs";
-import "js/plugins/preloadjs";
+// import "whatwg-fetch";
+// import "js/plugins/soundjs";
+// import "js/plugins/preloadjs";

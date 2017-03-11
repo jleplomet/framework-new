@@ -1,12 +1,11 @@
-
 String.prototype.strpos = function(str) {
   return this.indexOf(str) !== -1;
-}
+};
 
-var userAgent = navigator.userAgent.toLowerCase();
+let userAgent = navigator.userAgent.toLowerCase();
 
 export function searchUA(val) {
-  if (typeof val === 'string') {
+  if (typeof val === "string") {
     val = [val];
   }
 
@@ -20,4 +19,11 @@ export function searchUA(val) {
   }
 
   return false;
+}
+
+/**
+ * For testing purposes only.
+ */
+export function setUserAgent(val) {
+  userAgent = val;
 }

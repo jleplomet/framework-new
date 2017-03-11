@@ -1,83 +1,116 @@
-
 /**
  * Development Webpack Configuration
  */
 
- const path = require('path');
- const webpack = require('webpack');
-//  const cdnurl = require('../src/js/cdnurl');
+const path = require("path");
+const webpack = require("webpack");
 
- // webpack plugins
- const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
- const HtmlWebpackPlugin = require('html-webpack-plugin');
- const ExtractTextPlugin = require('extract-text-webpack-plugin');
+// webpack plugins
+const {BundleAnalyzerPlugin} = require("webpack-bundle-analyzer");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
 
 // stuff
- var autoprefixer = require('autoprefixer');
+var autoprefixer = require("autoprefixer");
 
- module.exports = require('./base')({
-   entry: {
-     main: 'js/main',
+module.exports = require("./base")({
+  entry: {
+    common: ["whatwg-fetch", "js/plugins/soundjs", "js/plugins/preloadjs"],
 
-     common: [
-       'whatwg-fetch',
-       'js/plugins/soundjs',
-       'js/plugins/preloadjs'
-     ],
-   },
+    // react: ["react", "react-dom"],
 
-   output: {
-     path: './dist/files/',
+    main: "js/main",
+  },
 
-     publicPath: 'files/',
+  output: {
+    path: "./dist/files/",
 
-     filename: 'chunk.[name].[chunkhash:8].js'
-   },
+    publicPath: "files/",
 
-   cssLoaders: ExtractTextPlugin.extract('css-loader!postcss-loader!sass-loader'),
+    filename: "chunk.[name].[chunkhash:8].js",
+  },
 
-   plugins: [
-     new webpack.LoaderOptionsPlugin({
-       minimize: true,
-       debug: false
-     }),
+  cssLoaders: ExtractTextPlugin.extract({
+    fallback: "style-loader",
+    use: [
+      {
+        loader: "css-loader",
+      },
+      {
+        loader: "postcss-loader",
+      },
+      {
+        loader: "sass-loader",
+      },
+    ],
+    publicPath: "../",
+  }),
 
-    //  new BundleAnalyzerPlugin(),
-     
-     new webpack.optimize.CommonsChunkPlugin({
-       name: ['common', 'manifest']
-     }),
+  plugins: [
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false,
+    }),
 
-     // split css to its own file
-     new ExtractTextPlugin({filename: 'main.css', disable: false, allChunks: true}),
+    new BundleAnalyzerPlugin(),
 
-     // minify js fils
-     new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false,
-          screw_ie8: true,
-          conditionals: true,
-          unused: true,
-          comparisons: true,
-          sequences: true,
-          dead_code: true,
-          evaluate: true,
-          if_return: true,
-          join_vars: true,
-        },
-        output: {
-          comments: false
-        },
-     }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ["common"],
+    }),
 
-     new HtmlWebpackPlugin({
-       filename: '../index.html',
-       template: 'layout/index.html',
-     })
-   ],
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "main",
+      async: true,
+    }),
 
-   performance: {
-     hints: "warning",
-     maxEntrypointSize: 400000
-   }
- })
+    // split css to its own file
+    new ExtractTextPlugin({
+      filename: "main.css",
+      disable: false,
+      allChunks: true,
+    }),
+
+    // minify js fils
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+        screw_ie8: true,
+        conditionals: true,
+        unused: true,
+        comparisons: true,
+        sequences: true,
+        dead_code: true,
+        evaluate: true,
+        if_return: true,
+        join_vars: true,
+      },
+      output: {
+        comments: false,
+      },
+    }),
+
+    new HtmlWebpackPlugin({
+      filename: "../index.html",
+      template: "layout/index.html",
+      excludeChunks: ["react"],
+    }),
+
+    // new SWPrecacheWebpackPlugin({
+    //   cacheId: "cache",
+    //   filename: "../service-worker.js",
+    //   staticFileGlobs: [
+    //     "./dist/files/**/*.js",
+    //     "./dist/files/**/*.css",
+    //     "./dist/files/**/*.{png,jpg,gif,svg}",
+    //     "./dist/*.html",
+    //   ],
+    //   stripPrefix: "./dist/",
+    // }),
+  ],
+
+  performance: {
+    hints: "warning",
+    maxEntrypointSize: 400000,
+  },
+});

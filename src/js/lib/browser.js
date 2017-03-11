@@ -1,7 +1,6 @@
+import {searchUA, setUserAgent} from "./common";
 
-import {searchUA} from "./common";
-
-var browser = {};
+let browser = {};
 
 detectBrowser();
 
@@ -11,7 +10,7 @@ detectBrowser();
  */
 export function isChrome() {
   return browser.vendor.chrome;
-} 
+}
 
 /**
  * Determine if current browser vendor is Safari
@@ -96,8 +95,8 @@ export function videoExtension() {
 /**
  * Test only function
  */
-export function setUserAgent(ua) {
-  userAgent = ua.toLowerCase();
+export function setUA(ua) {
+  setUserAgent(ua.toLowerCase());
 
   detectBrowser();
 }
@@ -105,54 +104,54 @@ export function setUserAgent(ua) {
 function detectBrowser() {
   browser = {
     vendor: {
-      chrome:  searchUA('chrome'),
-      safari:  searchUA('safari') && !searchUA('chrome'),
-      firefox: searchUA('firefox'),
-      edge: searchUA('windows') && searchUA('edge'),
-      ie: searchUA('msie') || (searchUA('trident') && searchUA('rv:')),
-      ie11: searchUA('msie') && searchUA('11.0')
+      chrome: searchUA("chrome"),
+      safari: searchUA("safari") && !searchUA("chrome"),
+      firefox: searchUA("firefox"),
+      edge: searchUA("windows") && searchUA("edge"),
+      ie: searchUA("msie") || (searchUA("trident") && searchUA("rv:")),
+      ie11: searchUA("msie") && searchUA("11.0"),
     },
     features: {
-      serviceWorker: 'serviceWorker' in navigator &&
-        (location.protocol === 'https' ||
-         location.hostname === 'localhost' ||
-         location.hostname.indexOf('127.') === 0),
-      webWorker: typeof window.Worker !== 'undefined'
+      serviceWorker: "serviceWorker" in navigator &&
+        (location.protocol === "https" ||
+          location.hostname === "localhost" ||
+          location.hostname.indexOf("127.") === 0),
+      webWorker: typeof window.Worker !== "undefined",
     },
     supports: {
-      touchEvents: 'ontouchstart' in window,
+      touchEvents: "ontouchstart" in window,
       videoExtension: (() => {
-        let videoElement = document.createElement('video');
+        let videoElement = document.createElement("video");
 
         if (!videoElement.canPlayType) {
           return false;
         }
 
-        if (searchUA('chrome')) {
-          return 'webm';
+        if (searchUA("chrome")) {
+          return "webm";
         }
 
-        if (searchUA('firefox')) {
+        if (searchUA("firefox")) {
           if (videoElement.canPlayType('video/webm; codecs="vorbis,vp8"')) {
-            return 'webm';
+            return "webm";
           }
 
-          return 'ogv';
+          return "ogv";
         }
 
-        return 'mp4';
+        return "mp4";
       })(),
       webGL: (() => {
         try {
-          const canvas = document.createElement('canvas');
+          const canvas = document.createElement("canvas");
 
           return !!(window.WebGLRenderingContext &&
-            (canvas.getContext('webgl') ||
-             canvas.getContext('experimental-webgl')));
+            (canvas.getContext("webgl") ||
+              canvas.getContext("experimental-webgl")));
         } catch (e) {
           return false;
         }
-      })()
-    }
-  }
+      })(),
+    },
+  };
 }
