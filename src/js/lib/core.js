@@ -21,48 +21,36 @@ var _bootMethods = [];
 export function boot() {
   console.log(NAMESPACE, "boot");
 
-  return new Promise(resolve => {
-    const {
-      assets,
-      assetsLoadProgress,
-      assetsMaxConnections,
-      languageCode,
-      languageFile,
-      useReact,
-      reactMountSelector,
-    } = getSettings();
+  const {
+    assets,
+    assetsLoadProgress,
+    assetsMaxConnections,
+    languageCode,
+    languageFile,
+    useReact,
+  } = getSettings();
 
-    if (languageFile) {
-      setBootMethod(() => loadLanguage(languageCode));
-    }
+  if (languageFile) {
+    setBootMethod(() => loadLanguage(languageCode));
+  }
 
-    setBootMethod(() =>
-      loadAssets(assets, assetsLoadProgress, assetsMaxConnections));
+  setBootMethod(() =>
+    loadAssets(assets, assetsLoadProgress, assetsMaxConnections));
 
-    _bootMethods
-      .reduce(
-        (sequence, bootMethod) => {
-          return sequence.then(() => bootMethod());
-        },
-        Promise.resolve()
-      )
-      .then(async () => {
-        if (useReact) {
-          let reactEnvironment = await import("js/lib/react");
-          let routes = await import("js/routes");
+  return _bootMethods
+    .reduce(
+      (sequence, bootMethod) => {
+        return sequence.then(() => bootMethod());
+      },
+      Promise.resolve()
+    )
+    .then(async () => {
+      if (useReact) {
+        await loadReact();
+      }
 
-          let reactMountElement = element(reactMountSelector);
-
-          reactEnvironment.renderReact(
-            reactMountElement,
-            routes.default,
-            resolve
-          );
-        }
-
-        console.log(NAMESPACE, "boot complete");
-      });
-  });
+      console.log(NAMESPACE, "boot complete");
+    });
 }
 
 /**
@@ -88,4 +76,17 @@ export function setSettings(settings) {
  */
 export function setBootMethod(method) {
   _bootMethods.push(method);
+}
+
+async function loadReact() {
+  console.log(NAMESPACE, "loadReact");
+
+  const {reactMountSelector} = getSettings();
+
+  let reactEnvironment = await import("js/lib/react");
+  let routes = await import("js/routes");
+
+  let reactMountElement = element(reactMountSelector);
+
+  return reactEnvironment.renderReact(reactMountElement, routes.default);
 }

@@ -18,17 +18,15 @@ module.exports = require("./base")({
   entry: {
     common: ["whatwg-fetch", "js/plugins/soundjs", "js/plugins/preloadjs"],
 
-    // react: ["react", "react-dom"],
-
     main: "js/main",
   },
 
   output: {
     path: "./dist/files/",
 
-    publicPath: "files/",
+    filename: "[name].js",
 
-    filename: "chunk.[name].[chunkhash:8].js",
+    chunkFilename: "[name].[chunkhash:6].js",
   },
 
   cssLoaders: ExtractTextPlugin.extract({
@@ -62,6 +60,16 @@ module.exports = require("./base")({
     new webpack.optimize.CommonsChunkPlugin({
       name: "main",
       async: true,
+    }),
+
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "main",
+      async: true,
+      minChunks: ({resource}) => {
+        // i wish there was an easier way.
+        return (resource && resource.includes("/node_modules/react")) ||
+          (resource && resource.includes("/node_modules/react-dom"));
+      },
     }),
 
     // split css to its own file

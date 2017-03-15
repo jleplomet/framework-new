@@ -8,12 +8,8 @@ const NAMESPACE = "[js/lib/react]";
 export function renderReact(mountElement, routes, cb) {
   console.log(NAMESPACE, "renderReact");
 
-  console.log(NAMESPACE, "routes", routes);
-
-  ReactDOM.render(<RootComponent routes={routes} />, mountElement, () => {
-    if (cb) {
-      cb();
-    }
+  return new Promise(resolve => {
+    ReactDOM.render(<RootComponent routes={routes} />, mountElement, resolve);
   });
 }
 
