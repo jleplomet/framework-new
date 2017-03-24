@@ -14,7 +14,7 @@ export function isChrome() {
 
 /**
  * Determine if current browser vendor is Safari
- * @type {bool}
+ * @return {bool}
  */
 export function isSafari() {
   return browser.vendor.safari;
@@ -22,7 +22,7 @@ export function isSafari() {
 
 /**
  * Determine if current browser vendor is Firefox
- * @type {bool}
+ * @return {bool}
  */
 export function isFirefox() {
   return browser.vendor.firefox;
@@ -30,7 +30,7 @@ export function isFirefox() {
 
 /**
  * Determine if current browser vendor is Microsoft Edge
- * @type {bool}
+ * @return {bool}
  */
 export function isEdge() {
   return browser.vendor.edge;
@@ -38,7 +38,7 @@ export function isEdge() {
 
 /**
  * Determine if current browser vendor is IE
- * @type {bool}
+ * @return {bool}
  */
 export function isIE() {
   return browser.vendor.ie;
@@ -46,7 +46,7 @@ export function isIE() {
 
 /**
  * Determine if current browser vendor is IE 11
- * @type {bool}
+ * @return {bool}
  */
 export function isIE11() {
   return browser.vendor.ie11;
@@ -54,7 +54,7 @@ export function isIE11() {
 
 /**
  * Determine if current browser supports service workers
- * @type {bool}
+ * @return {bool}
  */
 export function serviceWorker() {
   return browser.features.serviceWorker;
@@ -62,7 +62,7 @@ export function serviceWorker() {
 
 /**
  * Determine if current browser supports Web Workers
- * @type {bool}
+ * @return {bool}
  */
 export function webWorker() {
   return browser.features.webWorker;
@@ -70,7 +70,7 @@ export function webWorker() {
 
 /**
  * Determine if current browser supports touch events
- * @type {bool}
+ * @return {bool}
  */
 export function touchEvent() {
   return browser.supports.touchEvents;
@@ -78,7 +78,7 @@ export function touchEvent() {
 
 /**
  * Determine if current browser supports WebGL
- * @type {bool}
+ * @return {bool}
  */
 export function webGL() {
   return browser.supports.webGL;
@@ -86,7 +86,7 @@ export function webGL() {
 
 /**
  * Determine video extension browser supports
- * @type {string}
+ * @return {string}
  */
 export function videoExtension() {
   return browser.supports.videoExtension;
@@ -94,6 +94,8 @@ export function videoExtension() {
 
 /**
  * Test only function
+ *
+ * @param {string} ua User Agent to switch out for testing
  */
 export function setUA(ua) {
   setUserAgent(ua.toLowerCase());
@@ -132,7 +134,7 @@ function detectBrowser() {
         }
 
         if (searchUA("firefox")) {
-          if (videoElement.canPlayType('video/webm; codecs="vorbis,vp8"')) {
+          if (videoElement.canPlayType("video/webm; codecs='vorbis,vp8'")) {
             return "webm";
           }
 

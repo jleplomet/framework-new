@@ -1,4 +1,3 @@
-
 import {searchUA} from "./common";
 
 let system = false;
@@ -8,7 +7,7 @@ detectSystem();
 
 /**
  * Determine if on high resolution device
- * @type {bool}
+ * @return {bool}
  */
 export function isRetina() {
   return system.type.retina;
@@ -16,7 +15,7 @@ export function isRetina() {
 
 /**
  * Determine if current device is phone
- * @type {bool}
+ * @return {bool}
  */
 export function isPhone() {
   return system.type.phone;
@@ -24,7 +23,7 @@ export function isPhone() {
 
 /**
  * Determine if current device is tablet
- * @type {bool}
+ * @return {bool}
  */
 export function isTablet() {
   return system.type.tablet;
@@ -32,7 +31,7 @@ export function isTablet() {
 
 /**
  * Determine if current device is desktop
- * @type {bool}
+ * @return {bool}
  */
 export function isDesktop() {
   return system.type.desktop;
@@ -40,7 +39,7 @@ export function isDesktop() {
 
 /**
  * Determin current OS of device
- * @type {string}
+ * @return {string}
  */
 export function os() {
   return system.os;
@@ -51,9 +50,18 @@ function detectSystem() {
 
   system = {
     type: (() => {
-      let type = {tablet: false, phone: false, desktop: true, device: '', retina: false};
+      let type = {
+        tablet: false,
+        phone: false,
+        desktop: true,
+        device: "",
+        retina: false,
+      };
 
-      if (!!(("ontouchstart"in window) || ("onpointerdown"in window)) && searchUA([...iOSDevices, "windows", "android", "blackberry"])) {
+      if (
+        !!("ontouchstart" in window || "onpointerdown" in window) &&
+        searchUA([...iOSDevices, "windows", "android", "blackberry"])
+      ) {
         type.tablet = Math.max(screen.width, screen.height) > 800;
         type.phone = !type.tablet;
         type.desktop = false;
@@ -66,27 +74,26 @@ function detectSystem() {
       return type;
     })(),
     os: (() => {
-      if (searchUA('mac os') && !searchUA(iOSDevices)) {
-        return 'Mac';
+      if (searchUA("mac os") && !searchUA(iOSDevices)) {
+        return "Mac";
       } else if (searchUA(iOSDevices)) {
-        return 'iOS';
-      } else if (searchUA('android')) {
-        return 'Android';
-      }
-      else if (searchUA('windows')) {
-        return 'Windows';
+        return "iOS";
+      } else if (searchUA("android")) {
+        return "Android";
+      } else if (searchUA("windows")) {
+        return "Windows";
       }
 
-      return 'Unknown';
+      return "Unknown";
     })(),
     osVersion: (() => {
-      if (system.os === 'iOS') {
+      if (system.os === "iOS") {
         let version = USER_AGENT.split("os ")[1].split("_");
         let major = version[0];
         let minor = version[1].split(" ")[0];
 
         return Number(major + "." + minor);
-      } else if (system.os === 'Android') {
+      } else if (system.os === "Android") {
         let version = USER_AGENT.split("android ")[1].split(";")[0];
 
         if (version.length > 3) {
@@ -98,6 +105,9 @@ function detectSystem() {
 
       return "unknown";
     })(),
-    webcam: !!(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia)
-  }
+    webcam: !!(navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia),
+  };
 }

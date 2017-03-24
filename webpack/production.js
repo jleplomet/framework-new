@@ -59,11 +59,20 @@ module.exports = require("./base")({
       name: ["common"],
     }),
 
-    // This will include everything like react, react-dom, react-router
+    // TODO: THis is a work in progress and will evolve with project use.
     new webpack.optimize.CommonsChunkPlugin({
-      name: "main",
       async: true,
-      minChunks: m => /node_modules/.test(m.resource),
+      children: true,
+      minChunks: (module, count) =>
+        module.resource &&
+        /react|redux|history/.test(module.resource) &&
+        count >= 1,
+    }),
+
+    new webpack.optimize.CommonsChunkPlugin({
+      async: true,
+      children: true,
+      minChunks: 2,
     }),
 
     // split css to its own file

@@ -11,8 +11,7 @@ import {nextFrame} from "js/lib/render";
 
 let settings = {
   languageFile: true,
-  useReact: false,
-  useRouter: MEMORY_HISTORY,
+  useReact: true,
 };
 
 setSettings(settings);

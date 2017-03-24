@@ -7,7 +7,7 @@ const {resolve} = require("path");
 const cdnurl = require("../src/js/cdnurl");
 
 // webpack plugins
-// const CopyWebPackPlugin = require("copy-webpack-plugin");
+const CopyWebPackPlugin = require("copy-webpack-plugin");
 
 module.exports = options => ({
   entry: options.entry,
@@ -79,11 +79,11 @@ module.exports = options => ({
 
     new webpack.NamedModulesPlugin(),
 
-    // new CopyWebPackPlugin([{from: "images", to: "images"}]),
+    new CopyWebPackPlugin([{from: "data", to: "data"}]),
+    //
+    new CopyWebPackPlugin([{from: "images", to: "images"}]),
 
-    //  new CopyWebPackPlugin([
-    //    {from: 'js/worker.js'}
-    //  ])
+    new CopyWebPackPlugin([{from: "js/worker.js"}]),
   ]),
 
   target: "web",

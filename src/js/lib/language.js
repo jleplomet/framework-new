@@ -1,26 +1,21 @@
+import cdnurl from "js/cdnurl";
 
-import {dataAsset} from './assets';
-
-const NAMESPACE = '[lib/language]';
+const NAMESPACE = "[js/lib/language]";
 
 let _language = false;
 
-export function loadLanguage(code, cb) {
-  console.log(NAMESPACE, 'loadLanguage', code);
-  
-  return new Promise(resolve => {
-    let url = dataAsset(`${code}.json`);
+export async function loadLanguage(code, cb) {
+  console.log(NAMESPACE, "loadLanguage", code);
 
-    fetch(url, {credentials:'same-origin'})
-      .then(response => response.json())
-      .then(data => {
-        _language = data;
+  let url = `${cdnurl}data/${code}.json`;
 
-        if (cb) {
-          cb(language);
-        }
+  return fetch(url, {credentials: "same-origin"})
+    .then(response => response.json())
+    .then(data => {
+      _language = data;
 
-        resolve();
-      })
-  })
+      if (cb) {
+        cb(language);
+      }
+    });
 }

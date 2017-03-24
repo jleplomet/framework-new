@@ -8,10 +8,10 @@ const NAMESPACE = "[js/lib/components/corecomponent]";
 
 class CoreComponent extends Component {
   getChildProps() {
-    const {location} = this.props;
+    const {location: {pathname}} = this.props;
 
     return {
-      key: `route-${cleanPathName(location.pathname)}`,
+      key: `route-${cleanPathName(pathname)}`,
     };
   }
 
