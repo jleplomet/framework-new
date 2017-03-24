@@ -1,48 +1,81 @@
 import React, {Component} from "react";
 import ReactDOM from "react-dom";
+import {Provider} from "react-redux";
+import {
+  Router,
+  browserHistory,
+  hashHistory,
+  createMemoryHistory,
+} from "react-router";
+import {combineReducers, createStore, compose, applyMiddleware} from "redux";
+import thunkMiddleware from "redux-thunk";
 
-import RootComponent from "./components/RootComponent";
+import {HASH_HISTORY, BROWSER_HISTORY} from "js/lib/core";
+
+import routes from "js/routes";
 
 const NAMESPACE = "[js/lib/react]";
 
-export function renderReact(mountElement, routes, cb) {
-  console.log(NAMESPACE, "renderReact");
+export async function renderReact(mountElement, useRouter, defaultReducers) {
+  console.log(NAMESPACE, "renderReact", "useRouter", useRouter);
+
+  let store = configureStore(defaultReducers);
 
   return new Promise(resolve => {
-    ReactDOM.render(<RootComponent routes={routes} />, mountElement, resolve);
+    ReactDOM.render(
+      <ConnectedRootComponent
+        store={store}
+        useRouter={useRouter}
+        routes={routes}
+      />,
+      mountElement,
+      resolve
+    );
   });
 }
 
-export function asyncComponent(getComponent) {
-  class AsyncComponent extends Component {
-    constructor(props) {
-      super(props);
+class ConnectedRootComponent extends Component {
+  getHistory() {
+    const {useRouter} = this.props;
 
-      this.state = {Component: AsyncComponent.Component};
+    if (useRouter === HASH_HISTORY) {
+      return hashHistory;
+    } else if (useRouter === BROWSER_HISTORY) {
+      return browserHistory;
     }
 
-    componentWillMount() {
-      if (!this.state.Component) {
-        getComponent().then(Component => {
-          AsyncComponent.Component = Component;
-
-          this.setState({Component});
-        });
-      }
-    }
-
-    render() {
-      const {Component} = this.state;
-
-      if (Component) {
-        return <Component {...this.props} />;
-      }
-
-      return null;
-    }
+    return createMemoryHistory();
   }
 
-  AsyncComponent.Component = null;
+  render() {
+    const {store, routes} = this.props;
 
-  return AsyncComponent;
+    return (
+      <Provider store={store}>
+        <Router history={this.getHistory()} routes={routes} />
+      </Provider>
+    );
+  }
+}
+
+function configureStore(reducers, initialState = {}) {
+  console.log(NAMESPACE, "createStore");
+
+  let finalReducers = combineReducers(reducers);
+  let store = createStore(finalReducers, initialState, storeEnhancer());
+
+  return store;
+}
+
+function storeEnhancer() {
+  if (process.env.NODE_ENV === "production") {
+    return compose(applyMiddleware(thunkMiddleware));
+  } else {
+    return compose(
+      applyMiddleware(
+        thunkMiddleware,
+        require("redux-logger")({level: "info", collapsed: true})
+      )
+    );
+  }
 }

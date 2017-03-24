@@ -1,11 +1,21 @@
-import {asyncComponent} from "js/lib/react";
+import React from "react";
+import {Route, IndexRoute} from "react-router";
 
-const Index = asyncComponent(() =>
-  import("js/components/landing/Index").then(module => module.default));
+import CoreComponent from "js/lib/components/CoreComponent";
 
-export default [
-  {
-    path: "/",
-    component: Index,
-  },
-];
+import Index from "js/components/landing/Index";
+
+function lazyLoad(component, cb) {
+  import(`js/components/${component}`).then(module => cb(null, module.default));
+}
+
+function getComponent(path) {
+  return (l, cb) => lazyLoad(path, cb);
+}
+
+export default (
+  <Route path="/" component={CoreComponent}>
+    <IndexRoute component={Index} />
+    <Route path="/about" getComponent={getComponent("about/About")} />
+  </Route>
+);

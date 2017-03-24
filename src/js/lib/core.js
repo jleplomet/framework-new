@@ -4,7 +4,26 @@ import element from "./element";
 
 const NAMESPACE = "[lib/core]";
 
-var _settings = {
+/**
+ * Default history type. Routing does not persist state across sessions.
+ *
+ * @type {string}
+ */
+export const MEMORY_HISTORY = "MEMORY_HISTORY";
+/**
+ * Routing with hashtag support.
+ *
+ * @type {string}
+ */
+export const HASH_HISTORY = "HASH_HISTORY";
+/**
+ * Routing with HTML5 History API support.
+ *
+ * @type {string}
+ */
+export const BROWSER_HISTORY = "BROWSER_HISTORY";
+
+let _settings = {
   assets: [],
   assetsLoadProgress: false,
   assetsMaxConnections: 10,
@@ -13,10 +32,12 @@ var _settings = {
   languageFile: false,
   languageCode: "en_us",
   useReact: false,
+  useRouter: MEMORY_HISTORY,
   reactMountSelector: "[data-app]",
 };
 
-var _bootMethods = [];
+let _bootMethods = [];
+let _defaultReducers = {};
 
 export function boot() {
   console.log(NAMESPACE, "boot");
@@ -28,6 +49,7 @@ export function boot() {
     languageCode,
     languageFile,
     useReact,
+    useRedux,
   } = getSettings();
 
   if (languageFile) {
@@ -39,14 +61,16 @@ export function boot() {
 
   return _bootMethods
     .reduce(
-      (sequence, bootMethod) => {
-        return sequence.then(() => bootMethod());
+      async (sequence, bootMethod) => {
+        await sequence;
+
+        bootMethod();
       },
       Promise.resolve()
     )
     .then(async () => {
       if (useReact) {
-        await loadReact();
+        let reactEnvironment = await loadReact();
       }
 
       console.log(NAMESPACE, "boot complete");
@@ -72,6 +96,34 @@ export function setSettings(settings) {
 }
 
 /**
+ * Add reducers for redux store.
+ *
+ * @param {string}   key     Identifier to repersent a piece of the store.
+ * @param {function} reducer A pure function with (state, action) => state signature. It describes how an action transforms the state into the next state;
+ */
+export function addReducer(key, reducer) {
+  Object.assign(_defaultReducers, {[key]: reducer});
+}
+
+/**
+ * Function that lets us express reducers as an object mapping from action types to handlers.
+ *
+ * @param  {object} initialState
+ * @param  {object} handlers
+ * @return [object]
+ */
+export function createReducer(initialState, handlers) {
+  return function reducer(state = initialState, action) {
+    if (handlers.hasOwnProperty(action.type)) {
+      return handlers[action.type](state, action);
+    }
+
+    // always return current state if no handler exists for action.type
+    return state;
+  };
+}
+
+/**
  * Add additional boot methods.
  */
 export function setBootMethod(method) {
@@ -81,12 +133,13 @@ export function setBootMethod(method) {
 async function loadReact() {
   console.log(NAMESPACE, "loadReact");
 
-  const {reactMountSelector} = getSettings();
-
+  let {reactMountSelector, useRouter} = getSettings();
   let reactEnvironment = await import("js/lib/react");
-  let routes = await import("js/routes");
-
   let reactMountElement = element(reactMountSelector);
 
-  return reactEnvironment.renderReact(reactMountElement, routes.default);
+  return reactEnvironment.renderReact(
+    reactMountElement,
+    useRouter,
+    _defaultReducers
+  );
 }

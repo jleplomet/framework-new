@@ -2,21 +2,23 @@
  * Development Webpack Configuration
  */
 
-const path = require("path");
+// const path = require("path");
 const webpack = require("webpack");
 
 // webpack plugins
 const {BundleAnalyzerPlugin} = require("webpack-bundle-analyzer");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
-
-// stuff
-var autoprefixer = require("autoprefixer");
+// const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
 
 module.exports = require("./base")({
   entry: {
-    common: ["whatwg-fetch", "js/plugins/soundjs", "js/plugins/preloadjs"],
+    common: [
+      "regenerator-runtime",
+      "whatwg-fetch",
+      // "js/plugins/soundjs",
+      "js/plugins/preloadjs",
+    ],
 
     main: "js/main",
   },
@@ -57,19 +59,11 @@ module.exports = require("./base")({
       name: ["common"],
     }),
 
+    // This will include everything like react, react-dom, react-router
     new webpack.optimize.CommonsChunkPlugin({
       name: "main",
       async: true,
-    }),
-
-    new webpack.optimize.CommonsChunkPlugin({
-      name: "main",
-      async: true,
-      minChunks: ({resource}) => {
-        // i wish there was an easier way.
-        return (resource && resource.includes("/node_modules/react")) ||
-          (resource && resource.includes("/node_modules/react-dom"));
-      },
+      minChunks: m => /node_modules/.test(m.resource),
     }),
 
     // split css to its own file
@@ -101,7 +95,6 @@ module.exports = require("./base")({
     new HtmlWebpackPlugin({
       filename: "../index.html",
       template: "layout/index.html",
-      excludeChunks: ["react"],
     }),
 
     // new SWPrecacheWebpackPlugin({
@@ -120,5 +113,6 @@ module.exports = require("./base")({
   performance: {
     hints: "warning",
     maxEntrypointSize: 400000,
+    maxAssetSize: 300000,
   },
 });

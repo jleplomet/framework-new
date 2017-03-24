@@ -27,3 +27,15 @@ export function searchUA(val) {
 export function setUserAgent(val) {
   userAgent = val;
 }
+
+export function withoutKey(key, obj) {
+  let o = {};
+
+  Object.keys(obj).forEach(k => {
+    if (k !== key) {
+      o[k] = obj[k];
+    }
+  });
+
+  return o;
+}

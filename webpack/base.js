@@ -7,7 +7,7 @@ const {resolve} = require("path");
 const cdnurl = require("../src/js/cdnurl");
 
 // webpack plugins
-const CopyWebPackPlugin = require("copy-webpack-plugin");
+// const CopyWebPackPlugin = require("copy-webpack-plugin");
 
 module.exports = options => ({
   entry: options.entry,
