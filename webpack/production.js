@@ -26,9 +26,9 @@ module.exports = require("./base")({
   output: {
     path: "./dist/files/",
 
-    filename: "[name].js",
+    filename: "js/[name].js",
 
-    chunkFilename: "[name].[chunkhash:6].js",
+    chunkFilename: "js/[name].[chunkhash:6].js",
   },
 
   cssLoaders: ExtractTextPlugin.extract({
@@ -77,7 +77,7 @@ module.exports = require("./base")({
 
     // split css to its own file
     new ExtractTextPlugin({
-      filename: "main.css",
+      filename: "css/main.css",
       disable: false,
       allChunks: true,
     }),

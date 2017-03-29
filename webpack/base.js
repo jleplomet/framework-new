@@ -80,8 +80,10 @@ module.exports = options => ({
     new webpack.NamedModulesPlugin(),
 
     new CopyWebPackPlugin([{from: "data", to: "data"}]),
-    //
+
     new CopyWebPackPlugin([{from: "images", to: "images"}]),
+
+    new CopyWebPackPlugin([{from: "images", to: "sounds"}]),
 
     new CopyWebPackPlugin([{from: "js/worker.js"}]),
   ]),
