@@ -2,26 +2,32 @@ import "js/plugins";
 
 import "css/main";
 
-import {MEMORY_HISTORY, setSettings, boot} from "js/lib/core";
-import {nextFrame} from "js/lib/render";
-// import {imageAsset, loadAssets} from 'js/lib/assets';
+import {
+  startRender,
+  stopRender,
+  disableRender,
+  enableRender,
+  nextFrame,
+} from "js/lib/render";
 
-// first to load is code that only deals with asset loading and stuff. once thats done, we will demand code to boot up site.
-// that way, initial bundle will be tiny and only do one thing. load assets :-)
-
-let settings = {
-  languageFile: true,
-  useReact: true,
-};
-
-setSettings(settings);
-
-async function start() {
-  await boot();
-
-  // at this point, its pretty much guarenteed that react is up and running and
-  // rendered. although, if there is animation, not sure how that will tie in.
-  console.log("all done.");
+function render(time, diff, fps) {
+  console.log("FPS", fps);
 }
 
-nextFrame(start);
+// run your local render function in the global requestAnimationFrame loop
+startRender(render);
+
+// do you need to stop only your loop?
+// stopRender(render);
+
+// do you need to stop the global requestAnimationFrame loop?
+// disableRender();
+
+// do you need to restart the global requestionFrame loop?
+// enableRender();
+
+// do you need to fire a function once, on the next frame?
+function fire() {
+  console.log("FIRE");
+}
+nextFrame(() => fire());

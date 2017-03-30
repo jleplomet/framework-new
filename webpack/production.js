@@ -17,7 +17,7 @@ module.exports = require("./base")({
       "regenerator-runtime",
       "whatwg-fetch",
       // "js/plugins/soundjs",
-      "js/plugins/preloadjs",
+      // "js/plugins/preloadjs",
     ],
 
     main: "js/main",
