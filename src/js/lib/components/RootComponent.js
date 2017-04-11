@@ -1,35 +1,22 @@
 /* eslint-disable no-unused-vars*/
-import React, {Component, PropTypes} from "react";
+import React, {Component} from "react";
+import PropTypes from "prop-types";
 /* eslint-enable no-unused-vars*/
 import {Provider} from "react-redux";
-import {
-  Router,
-  browserHistory,
-  hashHistory,
-  createMemoryHistory,
-} from "react-router";
+import {ConnectedRouter} from "react-router-redux";
+import {Route} from "react-router-dom";
 
-import {HASH_HISTORY, BROWSER_HISTORY} from "js/lib/core";
+import App from "js/app";
 
 class RootComponent extends Component {
-  getHistory() {
-    const {useRouter} = this.props;
-
-    if (useRouter === HASH_HISTORY) {
-      return hashHistory;
-    } else if (useRouter === BROWSER_HISTORY) {
-      return browserHistory;
-    }
-
-    return createMemoryHistory();
-  }
-
   render() {
-    const {store, routes} = this.props;
+    const {store, history} = this.props;
 
     return (
       <Provider store={store}>
-        <Router history={this.getHistory()} routes={routes} />
+        <ConnectedRouter history={history}>
+          <Route component={App} />
+        </ConnectedRouter>
       </Provider>
     );
   }

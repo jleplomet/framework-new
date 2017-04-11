@@ -9,19 +9,19 @@ const NAMESPACE = "[lib/core]";
  *
  * @type {string}
  */
-export const MEMORY_HISTORY = "MEMORY_HISTORY";
+export const MEMORY_HISTORY = "createMemoryHistory";
 /**
  * Routing with hashtag support.
  *
  * @type {string}
  */
-export const HASH_HISTORY = "HASH_HISTORY";
+export const HASH_HISTORY = "createHashHistory";
 /**
  * Routing with HTML5 History API support.
  *
  * @type {string}
  */
-export const BROWSER_HISTORY = "BROWSER_HISTORY";
+export const BROWSER_HISTORY = "createBrowserHistory";
 
 let _settings = {
   assets: [],
@@ -34,6 +34,7 @@ let _settings = {
   useReact: false,
   useRouter: MEMORY_HISTORY,
   reactMountSelector: "[data-app]",
+  staticReactComponents: [],
 };
 
 let _bootMethods = [];
@@ -70,7 +71,7 @@ export function boot() {
     )
     .then(async () => {
       if (useReact) {
-        let reactEnvironment = await loadReact();
+        let {store, history, navigate} = await loadReact();
       }
 
       console.log(NAMESPACE, "boot complete");
@@ -133,13 +134,14 @@ export function setBootMethod(method) {
 async function loadReact() {
   console.log(NAMESPACE, "loadReact");
 
-  let {reactMountSelector, useRouter} = getSettings();
+  let {reactMountSelector, useRouter, staticReactComponents} = getSettings();
   let reactEnvironment = await import("js/lib/react");
   let reactMountElement = element(reactMountSelector);
 
   return reactEnvironment.renderReact(
     reactMountElement,
     useRouter,
-    _defaultReducers
+    _defaultReducers,
+    staticReactComponents
   );
 }
