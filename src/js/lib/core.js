@@ -1,5 +1,6 @@
 import {loadLanguage} from "./language";
 import {loadAssets} from "./assets";
+import {nextFrame} from "./render";
 import element from "./element";
 
 const NAMESPACE = "[lib/core]";
@@ -27,17 +28,14 @@ let _settings = {
   assets: [],
   assetsLoadProgress: false,
   assetsMaxConnections: 10,
-  cdnurl: "files/",
-  phpurl: "files/php/",
-  languageFile: false,
-  languageCode: "en_us",
+  languageCode: false,
   useReact: false,
   useRouter: MEMORY_HISTORY,
   reactMountSelector: "[data-app]",
-  staticReactComponents: [],
 };
 
 let _bootMethods = [];
+let _stateMethods = [];
 let _defaultReducers = {};
 
 export function boot() {
@@ -48,34 +46,42 @@ export function boot() {
     assetsLoadProgress,
     assetsMaxConnections,
     languageCode,
-    languageFile,
     useReact,
-    useRedux,
   } = getSettings();
 
-  if (languageFile) {
-    setBootMethod(() => loadLanguage(languageCode));
+  if (languageCode) {
+    addBootMethod(() => loadLanguage(languageCode));
   }
 
-  setBootMethod(() =>
-    loadAssets(assets, assetsLoadProgress, assetsMaxConnections));
+  if (assets.length) {
+    addBootMethod(() =>
+      loadAssets(assets, assetsLoadProgress, assetsMaxConnections)
+    );
+  }
 
-  return _bootMethods
-    .reduce(
-      async (sequence, bootMethod) => {
-        await sequence;
+  return new Promise(async resolve => {
+    await Promise.all(_bootMethods.map(method => method()));
 
-        bootMethod();
-      },
-      Promise.resolve()
-    )
-    .then(async () => {
-      if (useReact) {
-        let {store, history, navigate} = await loadReact();
-      }
+    console.log(NAMESPACE, "bootMethods complete");
+
+    if (useReact) {
+      let {store, navigate} = await loadReact();
+
+      console.log(NAMESPACE, "loadReact complete");
+
+      await Promise.all(_stateMethods.map(method => method(store.dispatch)));
+
+      console.log(NAMESPACE, "stateMethods complete");
 
       console.log(NAMESPACE, "boot complete");
-    });
+
+      return nextFrame(() => resolve({store, navigate}));
+    }
+
+    console.log(NAMESPACE, "boot complete");
+
+    nextFrame(() => resolve());
+  });
 }
 
 /**
@@ -127,21 +133,24 @@ export function createReducer(initialState, handlers) {
 /**
  * Add additional boot methods.
  */
-export function setBootMethod(method) {
+export function addBootMethod(method) {
   _bootMethods.push(method);
+}
+
+export function addStateMethod(method) {
+  _stateMethods.push(method);
 }
 
 async function loadReact() {
   console.log(NAMESPACE, "loadReact");
 
-  let {reactMountSelector, useRouter, staticReactComponents} = getSettings();
+  let {reactMountSelector, useRouter} = getSettings();
   let reactEnvironment = await import("js/lib/react");
   let reactMountElement = element(reactMountSelector);
 
   return reactEnvironment.renderReact(
     reactMountElement,
     useRouter,
-    _defaultReducers,
-    staticReactComponents
+    _defaultReducers
   );
 }

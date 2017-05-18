@@ -4,12 +4,12 @@ import thunkMiddleware from "redux-thunk";
 
 const NAMESPACE = "[js/lib/redux]";
 
-export function configureStore(reducers, useRouter, initialState = {}) {
+export function configureStore(reducers, useRouter) {
   console.log(NAMESPACE, "createStore");
 
   let history = getHistory(useRouter);
   let finalReducers = combineReducers({...reducers, router: routerReducer});
-  let store = createStore(finalReducers, initialState, storeEnhancer(history));
+  let store = createStore(finalReducers, {}, storeEnhancer(history));
 
   return {store, history};
 }

@@ -3,6 +3,8 @@
 
 .wrapper {
   @include position-relative(100%, 100%);
+
+  background: #202020;
 }
 
 [class^="route-"],

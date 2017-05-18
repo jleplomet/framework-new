@@ -2,7 +2,7 @@
  * Development Webpack Configuration
  */
 
-// const path = require("path");
+const path = require("path");
 const webpack = require("webpack");
 
 // webpack plugins
@@ -24,7 +24,7 @@ module.exports = require("./base")({
   },
 
   output: {
-    path: "./dist/files/",
+    path: path.resolve(__dirname, "../dist/files/"),
 
     filename: "js/[name].js",
 
@@ -53,7 +53,7 @@ module.exports = require("./base")({
       debug: false,
     }),
 
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
 
     new webpack.optimize.CommonsChunkPlugin({
       name: ["common"],

@@ -2,9 +2,9 @@
 import React from "react";
 /* eslint-enable no-unused-vars*/
 import ReactDOM from "react-dom";
+import Loadable from "react-loadable";
 
 import {configureStore} from "js/lib/redux";
-import {push} from "react-router-redux";
 import RootComponent from "js/lib/components/RootComponent";
 
 const NAMESPACE = "[js/lib/react]";
@@ -18,8 +18,14 @@ export function renderReact(mountElement, useRouter, defaultReducers) {
     ReactDOM.render(
       <RootComponent store={store} history={history} />,
       mountElement,
-      () =>
-        resolve({store, history, navigate: path => store.dispatch(push(path))})
+      () => resolve({store, navigate: path => history.push(path)})
     );
+  });
+}
+
+export function loadComponent(opts) {
+  return Loadable({
+    LoadingComponent: () => null,
+    ...opts,
   });
 }

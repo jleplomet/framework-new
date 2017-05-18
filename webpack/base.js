@@ -83,7 +83,7 @@ module.exports = options => ({
 
     new CopyWebPackPlugin([{from: "images", to: "images"}]),
 
-    new CopyWebPackPlugin([{from: "images", to: "sounds"}]),
+    new CopyWebPackPlugin([{from: "sounds", to: "sounds"}]),
 
     new CopyWebPackPlugin([{from: "js/worker.js"}]),
   ]),
