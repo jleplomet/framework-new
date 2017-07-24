@@ -77,7 +77,9 @@ module.exports = options => ({
       "process.env": {NODE_ENV: JSON.stringify(process.env.NODE_ENV)},
     }),
 
-    new webpack.NamedModulesPlugin(),
+    // new webpack.NamedModulesPlugin(),
+
+    new webpack.optimize.ModuleConcatenationPlugin(),
 
     new CopyWebPackPlugin([{from: "data", to: "data"}]),
 

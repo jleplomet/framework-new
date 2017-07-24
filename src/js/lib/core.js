@@ -145,7 +145,9 @@ async function loadReact() {
   console.log(NAMESPACE, "loadReact");
 
   let {reactMountSelector, useRouter} = getSettings();
-  let reactEnvironment = await import("js/lib/react");
+  let reactEnvironment = await import(
+    /* webpackChunkName: "react" */ "js/lib/react"
+  );
   let reactMountElement = element(reactMountSelector);
 
   return reactEnvironment.renderReact(

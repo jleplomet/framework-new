@@ -17,7 +17,7 @@ module.exports = require("./base")({
       "regenerator-runtime",
       "whatwg-fetch",
       // "js/plugins/soundjs",
-      "js/plugins/preloadjs",
+      // "js/plugins/preloadjs",
     ],
 
     main: "js/main",
@@ -83,23 +83,23 @@ module.exports = require("./base")({
     }),
 
     // minify js fils
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-        screw_ie8: true,
-        conditionals: true,
-        unused: true,
-        comparisons: true,
-        sequences: true,
-        dead_code: true,
-        evaluate: true,
-        if_return: true,
-        join_vars: true,
-      },
-      output: {
-        comments: false,
-      },
-    }),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false,
+    //     screw_ie8: true,
+    //     conditionals: true,
+    //     unused: true,
+    //     comparisons: true,
+    //     sequences: true,
+    //     dead_code: true,
+    //     evaluate: true,
+    //     if_return: true,
+    //     join_vars: true,
+    //   },
+    //   output: {
+    //     comments: false,
+    //   },
+    // }),
 
     new HtmlWebpackPlugin({
       filename: "../index.html",

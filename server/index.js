@@ -1,67 +1,131 @@
 /* Borrowed some code from
  * https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/scripts/start.js */
 
-var chalk = require("chalk");
-var detect = require("detect-port");
-var ngrok = require("ngrok");
-var ip = require("ip");
-var webpack = require("webpack");
-var webpackConfig = require("../webpack/development");
-var webpackDevServer = require("webpack-dev-server");
+let address = require("address");
+let fs = require("fs");
+let url = require("url");
+let chalk = require("chalk");
+let detect = require("detect-port");
+let webpack = require("webpack");
+let webpackConfig = require("../webpack/development");
+let WebpackDevServer = require("webpack-dev-server");
+let clearConsole = require("react-dev-utils/clearConsole");
+let formatWebpackMessages = require("react-dev-utils/formatWebpackMessages");
+let openBrowser = require("react-dev-utils/openBrowser");
 
-var clearConsole = require("react-dev-utils/clearConsole");
-var formatWebpackMessages = require("react-dev-utils/formatWebpackMessages");
-var openBrowser = require("react-dev-utils/openBrowser");
+const IS_INTERACTIVE = process.stdout.isTTY;
+const DEFAULT_PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
 
-var isInteractive = process.stdout.isTTY;
+function run(port) {
+  const protocol = process.env.HTTPS === "true" ? "https" : "http";
+  const formatUrl = hostname =>
+    url.format({protocol, hostname, port, pathname: "/"});
+  const formattedUrl = formatUrl(HOST);
+  const isUnspecifiedAddress = HOST === "0.0.0.0" || HOST === "::";
 
-var defaultPort = process.env.PORT || 3000;
-var compiler;
+  let prettyHost;
+  let lanAddress;
 
-function setupCompiler(host, port, protocol) {
-  compiler = webpack(webpackConfig);
+  if (isUnspecifiedAddress) {
+    prettyHost = "localhost";
 
-  compiler.plugin("invalid", function() {
-    if (isInteractive) {
+    try {
+      lanAddress = address.ip();
+    } catch (e) {}
+  } else {
+    prettyHost = HOST;
+  }
+
+  const compiler = createWebpackCompiler(webpackConfig, showInstructions => {
+    if (!showInstructions) {
+      return;
+    }
+
+    console.log();
+    console.log("The app is running at:");
+    console.log();
+
+    if (isUnspecifiedAddress && lanAddress) {
+      console.log(`  Local: ${chalk.cyan(formattedUrl)}`);
+      console.log(`  Network: ${chalk.cyan(formatUrl(lanAddress))}`);
+    } else {
+      console.log(`  ${chalk.cyan(formattedUrl)}`);
+    }
+
+    console.log();
+    console.log("Note that the development build is not optimized.");
+    console.log(
+      `To create a production build, use ${chalk.cyan(`npm run build`)}.`
+    );
+    console.log();
+  });
+
+  const devServer = new WebpackDevServer(
+    compiler,
+    createWebpackDevServer(lanAddress, protocol)
+  );
+
+  devServer.listen(port, HOST, err => {
+    if (err) {
+      return console.log(err);
+    }
+
+    if (IS_INTERACTIVE) {
+      clearConsole();
+    }
+
+    console.log(chalk.cyan("Starting the development server..."));
+    console.log();
+
+    openBrowser(formatUrl(prettyHost));
+  });
+}
+
+function createWebpackCompiler(config, cb) {
+  let compiler;
+
+  try {
+    compiler = webpack(config);
+  } catch (error) {
+    console.log(chalk.red("Failed to compile."));
+    console.log();
+    console.log(error.message || error);
+    console.log();
+    process.exit(1);
+  }
+
+  compiler.plugin("invalid", () => {
+    if (IS_INTERACTIVE) {
       clearConsole();
     }
 
     console.log("Compiling...");
   });
 
-  var isFirstCompile = true;
+  let isFirstCompile = true;
 
-  compiler.plugin("done", function(stats) {
-    if (isInteractive) {
+  compiler.plugin("done", stats => {
+    if (IS_INTERACTIVE) {
       clearConsole();
     }
 
     // We have switched off the default Webpack output in WebpackDevServer
     // options so we are going to "massage" the warnings and errors and present
     // them in a readable focused way.
-    var messages = formatWebpackMessages(stats.toJson({}, true));
-    var isSuccessful = !messages.errors.length && !messages.warnings.length;
-    var showInstructions = isSuccessful && (isInteractive || isFirstCompile);
+    const messages = formatWebpackMessages(stats.toJson({}, true));
+    const isSuccessful = !messages.errors.length && !messages.warnings.length;
+    const showInstructions = isSuccessful && (IS_INTERACTIVE || isFirstCompile);
 
     if (isSuccessful) {
       console.log(chalk.green("Compiled successfully!"));
     }
 
-    if (showInstructions) {
-      console.log();
-      console.log("The app is running at:");
-      console.log();
-      console.log(
-        "  " + chalk.cyan(protocol + "://" + host + ":" + port + "/")
-      );
-      console.log();
-      console.log("Note that the development build is not optimized.");
-      console.log(
-        "To create a production build, use " + chalk.cyan("npm run build") + "."
-      );
-      console.log();
-      isFirstCompile = false;
+    if (typeof cb === "function") {
+      cb(showInstructions);
     }
+
+    isFirstCompile = false;
 
     // If errors exist, only show errors.
     if (messages.errors.length) {
@@ -82,84 +146,57 @@ function setupCompiler(host, port, protocol) {
         console.log(message);
         console.log();
       });
+
       // Teach some ESLint tricks.
-      console.log("You may use special comments to disable some warnings.");
       console.log(
-        "Use " +
-          chalk.yellow("// eslint-disable-next-line") +
-          " to ignore the next line."
+        chalk.dim(
+          "Search for the " +
+            chalk.cyan("rule keywords") +
+            " to learn more about each warning."
+        )
       );
       console.log(
-        "Use " +
-          chalk.yellow("/* eslint-disable */") +
-          " to ignore all warnings in a file."
+        chalk.dim(
+          "To ignore, add " +
+            chalk.yellow("// eslint-disable-next-line") +
+            " to the previous line."
+        )
       );
+      console.log();
     }
   });
+
+  return compiler;
 }
 
-function runDevServer(host, port, protocol) {
-  var devServer = new webpackDevServer(compiler, {
+function createWebpackDevServer(allowedHost, protocol) {
+  return {
+    // Enable gzip compression of generated files.
     compress: true,
-
+    // Silence WebpackDevServer's own logs since they're generally not useful.
+    // It will still show compile warnings and errors with this setting.
     clientLogLevel: "none",
-
+    // Enable hot reloading server. It will provide /sockjs-node/ endpoint
+    // for the WebpackDevServer client so it can learn when the files were
+    // updated. The WebpackDevServer client is included as an entry point
+    // in the Webpack development configuration. Note that only changes
+    // to CSS are currently hot reloaded. JS changes will refresh the browser.
     hot: true,
-
+    // It is important to tell WebpackDevServer to use the same "root" path
+    // as we specified in the config. In development, we always serve from /.
     publicPath: webpackConfig.output.publicPath,
-
+    // WebpackDevServer is noisy by default so we emit custom message instead
+    // by listening to the compiler events with `compiler.plugin` calls above.
     quiet: true,
-
+    // Reportedly, this avoids CPU overload on some systems.
+    // https://github.com/facebookincubator/create-react-app/issues/293
     watchOptions: {
       ignored: /node_modules/,
     },
-  });
-
-  devServer.listen(port, (error, result) => {
-    if (error) {
-      return console.log(error);
-    }
-
-    if (isInteractive) {
-      clearConsole();
-    }
-
-    console.log(chalk.cyan("Starting the development server...\n"));
-    console.log();
-
-    ngrok.connect(port, (innerErr, tunnelStarted) => {
-      if (innerErr) {
-        return console.log(innerErr);
-      }
-
-      let divider = chalk.gray("\n-----------------------------------");
-
-      // console.log();
-      console.log(
-        chalk.bold("\nAccess URLs:") +
-          divider +
-          "\nLocalhost: " +
-          chalk.magenta("http://localhost:" + port) +
-          "\n      LAN: " +
-          chalk.magenta("http://" + ip.address() + ":" + port) +
-          (tunnelStarted
-            ? "\n    Proxy: " + chalk.magenta(tunnelStarted)
-            : "") +
-          divider,
-        chalk.blue("\nPress " + chalk.italic("CTRL-C") + " to stop\n")
-      );
-
-      openBrowser(protocol + "://" + host + ":" + port + "/");
-    });
-  });
+    https: protocol === "https",
+    host: HOST,
+    public: allowedHost,
+  };
 }
 
-function run(port) {
-  var protocol = process.env.HTTPS === "true" ? "https" : "http";
-  var host = process.env.HOST || "localhost";
-
-  setupCompiler(host, port, protocol);
-  runDevServer(host, port, protocol);
-}
-
-detect(defaultPort).then(port => run(port));
+detect(DEFAULT_PORT).then(port => run(port));
