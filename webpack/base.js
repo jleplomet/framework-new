@@ -4,6 +4,9 @@
 
 const webpack = require("webpack");
 const {resolve} = require("path");
+const paths = require("./config/paths");
+const InterpolateHtmlPlugin = require("./plugins/InterpolateHtmlPlugin");
+const WatchMissingNodeModulesPlugin = require("./plugins/WatchMissingNodeModulesPlugin");
 const cdnurl = require("../src/js/cdnurl");
 
 // webpack plugins
@@ -77,7 +80,16 @@ module.exports = options => ({
       "process.env": {NODE_ENV: JSON.stringify(process.env.NODE_ENV)},
     }),
 
+    // Makes some environment variables available in index.html.
+    // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
+    // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    // In development, this will be an empty string.
+    new InterpolateHtmlPlugin({cdnurl}),
+
+    // Add module names to factory functions so they appear in browser profiler.
     new webpack.NamedModulesPlugin(),
+
+    new WatchMissingNodeModulesPlugin(paths.nodeModules),
 
     new CopyWebPackPlugin([{from: "data", to: "data"}]),
 
@@ -95,4 +107,11 @@ module.exports = options => ({
   performance: Object.assign({}, options.performance),
 
   devtool: options.devtool,
+
+  node: {
+    dgram: "empty",
+    fs: "empty",
+    net: "empty",
+    tls: "empty",
+  },
 });

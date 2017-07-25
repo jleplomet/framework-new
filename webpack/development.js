@@ -12,14 +12,18 @@ const autoprefixer = require("autoprefixer");
 
 module.exports = require("./base")({
   entry: [
-    //  'react-hot-loader/patch',
-
     require.resolve("webpack-dev-server/client") + "?/",
 
     require.resolve("webpack/hot/dev-server"),
 
     "js/main.js",
   ],
+
+  output: {
+    pathinfo: true,
+
+    publicPath: "/",
+  },
 
   cssLoaders: [
     {
